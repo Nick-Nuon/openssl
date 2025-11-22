@@ -1,15 +1,16 @@
-#include <string.h>
-
-#ifdef __AVX2__
-# include <immintrin.h>
 # include <openssl/evp.h>
-# include <stddef.h>
-# include <stdint.h>
 # include "enc_b64_scalar.h"
 # include "enc_b64_avx2.h"
 # include "internal/cryptlib.h"
 # include "crypto/evp.h"
 # include "evp_local.h"
+
+#ifdef __AVX2__
+#include <string.h>
+# include <immintrin.h>
+# include <stddef.h>
+# include <stdint.h>
+
 static __m256i lookup_pshufb_std(__m256i input)
 {
     __m256i result = _mm256_subs_epu8(input, _mm256_set1_epi8(51));
@@ -630,5 +631,13 @@ int encode_base64_avx2(EVP_ENCODE_CTX *ctx, unsigned char *dst,
     return (size_t)(out - (uint8_t *)dst) +
         +evp_encodeblock_int(ctx, out, src + i, srclen - i, final_wrap_cnt);
 }
-
+# else
+int encode_base64_avx2(EVP_ENCODE_CTX *ctx, unsigned char *dst,
+                       const unsigned char *src, int srclen, int ctx_length,
+                       int *final_wrap_cnt)
+{   
+    /* AVX2 not supported, fallback to standard implementation */
+    // return evp_encodeblock_int(ctx, dst, src, srclen, final_wrap_cnt);
+    return 0;
+}
 #endif
