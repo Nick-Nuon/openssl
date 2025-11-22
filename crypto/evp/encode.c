@@ -23,11 +23,8 @@
 #endif
 
 
-#ifdef EVP_ENCODE_USE_AVX2
 # include "enc_b64_avx2.h"
-#else
 # include "enc_b64_scalar.h"
-#endif
 
 static unsigned char conv_ascii2bin(unsigned char a,
                                     const unsigned char *table);
