@@ -631,13 +631,4 @@ int encode_base64_avx2(EVP_ENCODE_CTX *ctx, unsigned char *dst,
     return (size_t)(out - (uint8_t *)dst) +
         +evp_encodeblock_int(ctx, out, src + i, srclen - i, final_wrap_cnt);
 }
-# else
-int encode_base64_avx2(EVP_ENCODE_CTX *ctx, unsigned char *dst,
-                       const unsigned char *src, int srclen, int ctx_length,
-                       int *final_wrap_cnt)
-{   
-    /* AVX2 not supported, fallback to standard implementation */
-    // return evp_encodeblock_int(ctx, dst, src, srclen, final_wrap_cnt);
-    return 0;
-}
 #endif

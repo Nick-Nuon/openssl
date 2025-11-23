@@ -19,7 +19,7 @@
      defined(__x86_64) || defined(__x86_64__) || \
      defined(_M_AMD64) || defined(_M_X64))
 
-# define EVP_ENCODE_USE_AVX2
+# define HAS_IA32CAP
 #endif
 
 
@@ -183,7 +183,7 @@ int EVP_EncodeUpdate(EVP_ENCODE_CTX *ctx, unsigned char *out, int *outl,
         j = evp_encodeblock_int(ctx, out, in, inl - (inl % ctx->length),
                                 &wrap_cnt);
     } else {
-#ifdef EVP_ENCODE_USE_AVX2
+#if defined(HAS_IA32CAP) && defined(__AVX2__)
         if ((OPENSSL_ia32cap_P[2] & (1u << 5)) != 0){
             const int newlines =
                 !(ctx->flags & EVP_ENCODE_CTX_NO_NEWLINES) ? ctx->length : 0;
@@ -243,7 +243,7 @@ int EVP_EncodeBlock(unsigned char *t, const unsigned char *f, int dlen)
 {
     int wrap_cnt = 0;
 
-#ifdef EVP_ENCODE_USE_AVX2
+#if defined(HAS_IA32CAP) && defined(__AVX2__)
     if ((OPENSSL_ia32cap_P[2] & (1u << 5)) != 0)
         return encode_base64_avx2(NULL, t, f, dlen, 0, &wrap_cnt);
     else
