@@ -5,7 +5,19 @@
 # include "crypto/evp.h"
 # include "evp_local.h"
 
-#ifdef __AVX2__
+
+
+#if defined(__x86_64) || defined(__x86_64__) || \
+     defined(_M_AMD64) || defined (_M_X64)
+/*
+ * Ensure this whole block is compiled with AVX2 enabled on GCC.
+ * Clang/MSVC will just ignore these pragmas.
+ */
+# if defined(__GNUC__) && !defined(__clang__)
+#  pragma GCC push_options
+#  pragma GCC target("avx2")
+# endif
+
 #include <string.h>
 # include <immintrin.h>
 # include <stddef.h>
@@ -631,4 +643,9 @@ int encode_base64_avx2(EVP_ENCODE_CTX *ctx, unsigned char *dst,
     return (size_t)(out - (uint8_t *)dst) +
         +evp_encodeblock_int(ctx, out, src + i, srclen - i, final_wrap_cnt);
 }
+
+# if defined(__GNUC__) && !defined(__clang__)
+#  pragma GCC pop_options
+# endif
+
 #endif
