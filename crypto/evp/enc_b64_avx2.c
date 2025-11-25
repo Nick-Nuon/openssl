@@ -224,7 +224,7 @@ static inline __m256i insert_line_feed32(__m256i input, int K)
     if (K >= 16) {
         __m128i maskhi = _mm_loadu_si128((__m128i *) shuffle_masks[K - 16]);
         __m256i mask = _mm256_set_m128i(maskhi, identity);
-        __m256i lf_pos = _mm256_cmpeq_epi8(mask, _mm256_set1_epi8(0x80));
+        __m256i lf_pos = _mm256_cmpeq_epi8(mask, _mm256_set1_epi8((char)0x80));
         __m256i shuffled = _mm256_shuffle_epi8(input, mask);
         __m256i result = _mm256_blendv_epi8(shuffled, line_feed_vector, lf_pos);
 
@@ -237,7 +237,7 @@ static inline __m256i insert_line_feed32(__m256i input, int K)
     input = _mm256_blend_epi32(input, shift, 0xF0);
     __m128i masklo = _mm_loadu_si128((__m128i *) shuffle_masks[K]);
     __m256i mask = _mm256_set_m128i(identity, masklo);
-    __m256i lf_pos = _mm256_cmpeq_epi8(mask, _mm256_set1_epi8(0x80));
+    __m256i lf_pos = _mm256_cmpeq_epi8(mask, _mm256_set1_epi8((char)0x80));
     __m256i shuffled = _mm256_shuffle_epi8(input, mask);
     __m256i result = _mm256_blendv_epi8(shuffled, line_feed_vector, lf_pos);
     return result;
@@ -293,10 +293,10 @@ static inline size_t insert_nl_gt16(const __m256i v0,
 
     __m256i mask_second_lane = _mm256_setr_epi8(0, 0, 0, 0, 0, 0, 0, 0,
                                                 0, 0, 0, 0, 0, 0, 0, 0,
-                                                0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-                                                0xFF, 0xFF, 0xFF,
-                                                0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-                                                0xFF, 0xFF, 0xFF);
+                                                (char)0xFF, (char)0xFF, (char)0xFF, (char)0xFF, (char)0xFF,
+                                                (char)0xFF, (char)0xFF, (char)0xFF,
+                                                (char)0xFF, (char)0xFF, (char)0xFF, (char)0xFF, (char)0xFF,
+                                                (char)0xFF, (char)0xFF, (char)0xFF);
 
     __m256i blended_0L = v0;
     int surplus_0 = wrap_rem < 16 ? 1 : 0;
@@ -364,9 +364,9 @@ static inline size_t insert_nl_2nd_vec_stride_12(const __m256i v0,
                                                  int *wrap_cnt)
 {
     __m256i shuffling_mask =
-        _mm256_setr_epi8(0, 1, 2, 3, 0xFF, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
-                         0xFF,
-                         0xFF, 0xFF, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0xFF,
+        _mm256_setr_epi8(0, 1, 2, 3, (char)0xFF, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+                         (char)0xFF,
+                         (char)0xFF, (char)0xFF, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, (char)0xFF,
                          12);
     __m256i shuffled = _mm256_shuffle_epi8(v0, shuffling_mask);
 
@@ -406,10 +406,10 @@ OPENSSL_TARGET_AVX2
 static inline size_t insert_nl_str4(const __m256i v0, uint8_t *output)
 {
     __m256i shuffling_mask =
-        _mm256_setr_epi8(0, 1, 2, 3, 0xFF, 4, 5, 6, 7, 0xFF,
-                         8, 9, 10, 11, 0xFF, 12,
-                         0xFF, 0xFF, 0xFF, 0xFF, 0, 1, 2, 3, 0xFF, 4, 5, 6, 7,
-                         0xFF,
+        _mm256_setr_epi8(0, 1, 2, 3, (char)0xFF, 4, 5, 6, 7, (char)0xFF,
+                         8, 9, 10, 11, (char)0xFF, 12,
+                         (char)0xFF, (char)0xFF, (char)0xFF, (char)0xFF, 0, 1, 2, 3, (char)0xFF, 4, 5, 6, 7,
+                         (char)0xFF,
                          8, 9);
     __m256i mask_5_bytes =
         _mm256_setr_epi8(0, 0, 0, 0, (char)0xFF, 0, 0, 0, 0, (char)0xFF,
@@ -470,10 +470,10 @@ OPENSSL_UNTARGET_AVX2
 OPENSSL_TARGET_AVX2
 static inline size_t insert_nl_str8(const __m256i v0, uint8_t *output)
 {
-    __m256i shuffling_mask = _mm256_setr_epi8(0, 1, 2, 3, 4, 5, 6, 7, 0xFF,
+    __m256i shuffling_mask = _mm256_setr_epi8(0, 1, 2, 3, 4, 5, 6, 7, (char)0xFF,
                                               8, 9, 10, 11, 12, 13, 14,
-                                              0xFF, 0xFF, 0, 1, 2, 3, 4, 5, 6,
-                                              7, 0xFF, 8, 9, 10, 11, 12);
+                                              (char)0xFF, (char)0xFF, 0, 1, 2, 3, 4, 5, 6,
+                                              7, (char)0xFF, 8, 9, 10, 11, 12);
     __m256i shuffled_4_bytes = _mm256_shuffle_epi8(v0, shuffling_mask);
     _mm256_storeu_si256((__m256i *) (output), shuffled_4_bytes);
     int8_t rem_1_L = _mm256_extract_epi8(v0, 15);
