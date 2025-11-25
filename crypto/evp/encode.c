@@ -184,7 +184,6 @@ int EVP_EncodeUpdate(EVP_ENCODE_CTX *ctx, unsigned char *out, int *outl,
     } else {
 #if defined(HAS_IA32CAP_IS_64)
         if ((OPENSSL_ia32cap_P[2] & (1u << 5)) != 0){
-            // printf("Using AVX2 base64 encode\n");
             const int newlines =
                 !(ctx->flags & EVP_ENCODE_CTX_NO_NEWLINES) ? ctx->length : 0;
 
