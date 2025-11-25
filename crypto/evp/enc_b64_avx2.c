@@ -330,7 +330,7 @@ static inline size_t insert_nl_gt16(const __m256i v0,
         _mm256_storeu_si256((__m256i *) (output), blended_1L);
 
         output[wrap_rem + surplus_0] = '\n';
-        output[31 + surplus_0] = sec_last_of_1L;
+        output[31 + surplus_0] = (uint8_t)sec_last_of_1L;
         output[31 + surplus_0 + surplus_1] = last_of_1L;
 
     }
@@ -600,10 +600,10 @@ int encode_base64_avx2(EVP_ENCODE_CTX *ctx, unsigned char *dst,
         } else if (stride == 4) {
             int out_idx = 0;
 
-            out_idx += insert_nl_str4(vec0, out + out_idx);
-            out_idx += insert_nl_str4(vec1, out + out_idx);
-            out_idx += insert_nl_str4(vec2, out + out_idx);
-            out_idx += insert_nl_str4(vec3, out + out_idx);
+            out_idx += (int)insert_nl_str4(vec0, out + out_idx);
+            out_idx += (int)insert_nl_str4(vec1, out + out_idx);
+            out_idx += (int)insert_nl_str4(vec2, out + out_idx);
+            out_idx += (int)insert_nl_str4(vec3, out + out_idx);
 
             out += out_idx;
         } else if (stride == 8) {
@@ -688,7 +688,7 @@ int encode_base64_avx2(EVP_ENCODE_CTX *ctx, unsigned char *dst,
         *out++ = '\n';
     }
 
-    return (size_t)(out - (uint8_t *)dst) +
+    return (int)(out - (uint8_t *)dst) +
         +evp_encodeblock_int(ctx, out, src + i, srclen - i, final_wrap_cnt);
 }
 OPENSSL_UNTARGET_AVX2
